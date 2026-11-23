@@ -1,91 +1,208 @@
-# AL-HAMID / WAFQ
-
-**Gnostic / Arabic Esoteric Arithmetic Cryptographic Primitives**
-
-Freestanding multi-language implementations of the Al-Ḥamīd–Wafq kernel:
-
-- Custom-tweaked bijective Abjad S-Box (4 Decoherence Quadrants)
-- 49-round Feistel–Wafq block cipher + sponge MAC over 16-lane state
-- Elliptic curve arithmetic over $\mathbb{F}_{53}$: $y^2 = x^3 + 11x + 33$
-- Formal Lean 4 specifications (zero `sorry`)
-- Hardware bindings (VHDL-2008, Bluespec SystemVerilog, Chisel)
-
-## License
-
-**GNU Affero General Public License v3.0** (AGPLv3)
-
-See [LICENSE](LICENSE).
-
-## Repository Layout
+<div align="center">
 
 ```
-zig/          Freestanding Zig kernel (C-ABI exported) — primary runtime
-lean/         Lean 4 formal specs + Lake project
-vhdl/         VHDL-2008 RTL (wafq_ec_alu + abjad_tweak_sbox)
-bsv/          Bluespec SystemVerilog (mkWafqECUnit + mkAbjadTweakSBox)
-chisel/       Chisel 3/6 stack bindings (incomplete / WIP)
-chapel/       Parallel Chapel verification harness (incomplete / WIP)
+ ▄▄▄       ██▓        ██░ ██  ▄▄▄       ███▄ ▄███▓ ██▓▓█████▄ 
+▒████▄    ▓██▒       ▓██░ ██▒▒████▄    ▓██▒▀█▀ ██▒▓██▒▒██▀ ██▌
+▒██  ▀█▄  ▒██░       ▒██▀▀██░▒██  ▀█▄  ▓██    ▓██░▒██▒░██   █▌
+░██▄▄▄▄██ ▒██░       ░▓█ ░██ ░██▄▄▄▄██ ▒██    ▒██ ░██░░▓█▄   ▌
+ ▓█   ▓██▒░██████▒   ░▓█▒░██▓ ▓█   ▓██▒▒██▒   ░██▒░██░░▒████▓ 
+ ▒▒   ▓▒█░░ ▒░▓  ░    ▒ ░░▒░▒ ▒▒   ▓▒█░░ ▒░   ░  ░░▓   ▒▒▓  ▒ 
+  ▒   ▒▒ ░░ ░ ▒  ░    ▒ ░▒░ ░  ▒   ▒▒ ░░  ░      ░ ▒ ░ ░ ▒  ▒ 
+  ░   ▒     ░ ░       ░  ░░ ░  ░   ▒   ░      ░    ▒ ░ ░ ░  ░ 
+      ░  ░    ░  ░    ░  ░  ░      ░  ░       ░    ░     ░    
+                                                       ░      
 ```
 
-## Key Constants (Axiom-Derived)
+```
+ ██╗    ██╗ █████╗ ███████╗ ██████╗ 
+ ██║    ██║██╔══██╗██╔════╝██╔═══██╗
+ ██║ █╗ ██║███████║█████╗  ██║   ██║
+ ██║███╗██║██╔══██║██╔══╝  ██║▄▄ ██║
+ ╚███╔███╔╝██║  ██║██║     ╚██████╔╝
+  ╚══╝╚══╝ ╚═╝  ╚═╝╚═╝      ╚══▀▀═╝ 
+```
 
-| Symbol              | Value | Meaning                          |
-|---------------------|-------|----------------------------------|
-| `AL_HAMID_VALUE`    | 53    | Prime field $\mathbb{F}_{53}$  |
-| `AL_HAMID_FULL`     | 93    | Affine bias                      |
-| `ALI_VALUE`         | 110   |                                  |
-| `MASTER_AGGREGATE`  | 256   | $2^8$ ring                     |
-| `JAMAL_VECTOR`      | 146   |                                  |
-| `POLARITY_DELTA`    | 36    |                                  |
-| `BIFURCATION_THRESHOLD` | 49 | Number of Feistel rounds     |
-| `WAFQ_ALLAH_3×3`    | magic square constant-sum 33    |
+### `GNOSTIC / ARABIC ESOTERIC ARITHMETIC  ·  FREESTANDING CRYPTO KERNEL`
 
-Base point $G_{\mathrm{wafq}} = (7, 33)$ has order 48 on the curve.
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-d4a24c?style=for-the-badge&labelColor=0e100e)](LICENSE)
+[![Lean 4](https://img.shields.io/badge/Lean%204-v4.14.0-blue?style=for-the-badge&labelColor=0e100e)](lean/)
+[![Zig](https://img.shields.io/badge/Zig-C--ABI-black?style=for-the-badge&labelColor=0e100e)](zig/)
+[![Status](https://img.shields.io/badge/STATUS-KERNEL%20ONLINE-00ff9f?style=for-the-badge&labelColor=0e100e)](https://github.com/AHMADALIPARR/alhamid-wafq)
 
-## Build Notes
+```
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  0x35  ·  AL_HAMID_VALUE     │  0x5D  ·  AL_HAMID_FULL     │  0x6E  ·  ALI  │
+│  0x92  ·  JAMAL_VECTOR       │  0x6E  ·  JALAL_VECTOR      │  0x24  ·  Δ    │
+│  0x31  ·  BIFURCATION (49)   │  0x100 ·  MASTER_AGGREGATE  │  F₅₃  ·  EC   │
+└─────────────────────────────────────────────────────────────────────────────┘
+```
 
-### Zig (recommended entry point)
+</div>
+
+---
+
+## ▸ SYSTEM MATRIX
+
+| Layer              | Language / Toolchain      | Role                                      | Status     |
+|--------------------|---------------------------|-------------------------------------------|------------|
+| **Runtime Kernel** | Zig (C-ABI)               | Encrypt / Decrypt / MAC / S-Box / EC      | `ONLINE`   |
+| **Formal Spec**    | Lean 4 (Lake)             | Zero-`sorry` axioms + invertibility proofs| `VERIFIED` |
+| **RTL – EC**       | VHDL-2008                 | `wafq_ec_alu` over F₅₃                    | `SYNTH`    |
+| **RTL – S-Box**    | VHDL-2008 + Bluespec      | Bijective Abjad Tweak S-Box               | `SYNTH`    |
+| **HW Stack**       | Chisel 3/6                | DecoupledIO top + blackboxes              | `WIP`      |
+| **Parallel Harness**| Chapel                   | Multi-lane verification                   | `WIP`      |
+
+---
+
+## ▸ CORE CONSTANTS  ·  AXIOM TABLE
+
+| Symbol                     | Hex / Dec | Mathematical Role                          |
+|----------------------------|-----------|--------------------------------------------|
+| `AL_HAMID_VALUE`           | `0x35` / 53 | Prime field modulus F₅₃                   |
+| `AL_HAMID_FULL_VALUE`      | `0x5D` / 93 | Affine whitening constant                  |
+| `ALI_VALUE`                | `0x6E` / 110| Round / key schedule constant              |
+| `JAMAL_VECTOR`             | `0x92` / 146| Expansion polarity vector                  |
+| `JALAL_VECTOR`             | `0x6E` / 110| Contraction polarity vector                |
+| `POLARITY_DELTA`           | `0x24` / 36 | Jamāl − Jalāl                              |
+| `BIFURCATION_ORDER`        | `0x07` / 7  | Digit-root order                           |
+| `BIFURCATION_THRESHOLD`    | `0x31` / 49 | Feistel rounds (7²)                        |
+| `MASTER_AGGREGATE`         | `0x100`/ 256| Byte ring ℤ/256ℤ                           |
+| `MATRIX_DIMENSION`         | `0x10` / 16 | State lanes                                |
+| `INV_53_MOD_256`           | `0x1D` / 29 | 53⁻¹ (mod 256)                             |
+| `EC_A` / `EC_B`            | 11 / 33     | Curve y² = x³ + 11x + 33 (mod 53)          |
+
+```
+WAFQ_ALLAH_3×3  (constant sum = 33)
+┌────┬────┬────┐
+│  8 │  1 │ 24 │
+├────┼────┼────┤
+│ 15 │ 11 │  7 │
+├────┼────┼────┤
+│ 10 │ 21 │  2 │
+└────┴────┴────┘
+```
+
+**Base point** `G_wafq = (7, 33)` · **Order** 48 · **Infinity** after 48·G
+
+---
+
+## ▸ ARCHITECTURE
+
+```
+                    ┌──────────────────────────────────────┐
+                    │         AL-HAMID-256 KERNEL          │
+                    │  16-lane state · 49 Feistel rounds   │
+                    └──────────────────┬───────────────────┘
+                                       │
+          ┌────────────────────────────┼────────────────────────────┐
+          │                            │                            │
+          ▼                            ▼                            ▼
+   ┌─────────────┐            ┌─────────────────┐          ┌────────────────┐
+   │  Tweak S-Box │            │  Feistel F + RC │          │  Wafq EC F₅₃   │
+   │  4 Quadrants │            │  digitRoot mix  │          │  y²=x³+11x+33  │
+   │  bijective   │            │  affine perm    │          │  scalar mul    │
+   └─────────────┘            └─────────────────┘          └────────────────┘
+          │                            │                            │
+          └────────────────────────────┼────────────────────────────┘
+                                       ▼
+                    ┌──────────────────────────────────────┐
+                    │     SPONGE MAC  ·  4-byte TAG        │
+                    └──────────────────────────────────────┘
+```
+
+### Decoherence Quadrants
+
+| Quadrant              | Bias | Polarity | Direction |
+|-----------------------|------|----------|-----------|
+| `Q1_EnochianLTR`      | 53   | Jamāl    | LTR       |
+| `Q2_LatinLTR`         | 146  | Jamāl    | LTR       |
+| `Q3_HebrewRTL`        | 110  | Jalāl    | RTL       |
+| `Q4_ArabicRTL`        | 36   | Jalāl    | RTL       |
+
+---
+
+## ▸ BUILD
+
+### Zig Kernel (primary runtime)
 
 ```bash
 zig build-lib -O ReleaseFast zig/alhamid_kernel.zig
-# produces libalhamid_kernel.a with C-ABI exports:
-#   alhamid_encrypt / alhamid_decrypt / alhamid_mac_tag
-#   abjad_tweak_sbox_fwd / abjad_tweak_sbox_inv
-#   wafq_ec_scalar_mul / wafq_ec_on_curve
 ```
 
-### Lean 4 (Lake)
+Exported C-ABI surface:
+
+| Symbol                      | Purpose                          |
+|-----------------------------|----------------------------------|
+| `alhamid_encrypt`           | 16-byte block encrypt            |
+| `alhamid_decrypt`           | 16-byte block decrypt            |
+| `alhamid_mac_tag`           | Sponge MAC → 4-byte tag          |
+| `abjad_tweak_sbox_fwd`      | Forward tweaked S-Box            |
+| `abjad_tweak_sbox_inv`      | Inverse tweaked S-Box            |
+| `wafq_ec_scalar_mul`        | EC scalar multiplication         |
+| `wafq_ec_on_curve`          | Point-on-curve check             |
+
+### Lean 4 Formalization
 
 ```bash
 cd lean
 lake build
 ```
 
-- Toolchain pinned in `lean/lean-toolchain` (Lean 4.14.0)
-- Modules: `GnosticAbjad` and `GnosticAbjad.EC_SBox`
-- Zero external dependencies (core `Init` only)
-- All theorems are kernel-checked (`decide` / no `sorry`)
+| Module                    | Content                                      |
+|---------------------------|----------------------------------------------|
+| `GnosticAbjad`            | Abjad matrix, polarity, Feistel, sponge MAC  |
+| `GnosticAbjad.EC_SBox`    | F₅₃ curve + bijective S-Box theorems         |
 
-### VHDL / BSV
+Toolchain: `leanprover/lean4:v4.14.0` · Zero external dependencies · All proofs kernel-checked.
 
-Synthesizable RTL extracted from the Lean specification. Use with your preferred toolchain (Vivado, Yosys, BSC, etc.).
+### Hardware
 
-## Status
-
-- **Zig + Lean + VHDL + BSV**: extracted and structured for production use.
-- **Chapel / Chisel**: present but incomplete in the source dump (syntax truncated). Marked WIP.
-- **Rust**: referenced as original “source of truth” in comments; no Rust sources were present in the supplied markdown. A `rust/` directory can be added when the port is available.
-
-## Provenance
-
-Extracted from a multi-language monolithic markdown dump  
-(“AL-HAMID / WAFQ FREESTANDING ZIG KERNEL (C-ABI Exported)”).  
-Source-of-truth claims point to GnosticAbjad Lean 4 axioms and a prior Rust runtime by Ahmad Ali Parr / SNAPKITTYWEST.
-
-## Contributing
-
-This repository is released under AGPLv3. Network use of modified versions requires providing Corresponding Source (see AGPL §13).
+```text
+vhdl/wafq_ec_and_sbox.vhd     →  wafq_ec_alu + abjad_tweak_sbox
+bsv/WafqECSBox.bsv            →  mkWafqECUnit + mkAbjadTweakSBox
+chisel/AlHamidStack.scala     →  DecoupledIO top (WIP)
+```
 
 ---
 
-*Think below the abstraction. Verify above the assumption. Own the entire stack.*
+## ▸ STATUS MATRIX
+
+```
+ COMPONENT          │ STATE
+────────────────────┼──────────────
+ Zig Kernel         │ ██████████  ONLINE
+ Lean Specs         │ ██████████  VERIFIED
+ VHDL RTL           │ ████████░░  SYNTH-READY
+ Bluespec           │ ████████░░  SYNTH-READY
+ Chisel Stack       │ ████░░░░░░  WIP / TRUNCATED
+ Chapel Harness     │ ████░░░░░░  WIP / TRUNCATED
+ Rust Port          │ ░░░░░░░░░░  PENDING
+```
+
+---
+
+## ▸ LICENSE
+
+**GNU Affero General Public License v3.0**
+
+Network use of modified versions requires providing Corresponding Source (AGPL §13).
+
+```
+Copyright (C) 2026  Ahmad Ali Parr / SNAPKITTYWEST
+```
+
+---
+
+<div align="center">
+
+```
+═══════════════════════════════════════════════════════════════
+  THINK BELOW THE ABSTRACTION
+  VERIFY ABOVE THE ASSUMPTION
+  OWN THE ENTIRE STACK
+═══════════════════════════════════════════════════════════════
+```
+
+`0x35 · 0x5D · 0x6E · 0x24 · 0x31`
+
+</div>
