@@ -20,12 +20,11 @@ See [LICENSE](LICENSE).
 
 ```
 zig/          Freestanding Zig kernel (C-ABI exported) — primary runtime
-lean/         Lean 4 formal specs (EC_SBox + GnosticAbjad core)
+lean/         Lean 4 formal specs + Lake project
 vhdl/         VHDL-2008 RTL (wafq_ec_alu + abjad_tweak_sbox)
 bsv/          Bluespec SystemVerilog (mkWafqECUnit + mkAbjadTweakSBox)
 chisel/       Chisel 3/6 stack bindings (incomplete / WIP)
 chapel/       Parallel Chapel verification harness (incomplete / WIP)
-docs/         Design notes and extraction notes
 ```
 
 ## Key Constants (Axiom-Derived)
@@ -55,13 +54,17 @@ zig build-lib -O ReleaseFast zig/alhamid_kernel.zig
 #   wafq_ec_scalar_mul / wafq_ec_on_curve
 ```
 
-### Lean 4
+### Lean 4 (Lake)
 
 ```bash
-lake build   # once a lakefile is added
+cd lean
+lake build
 ```
 
-The two Lean files are self-contained (`Init` only) and contain exhaustive kernel-checked theorems for bijectivity, curve order, and Feistel invertibility.
+- Toolchain pinned in `lean/lean-toolchain` (Lean 4.14.0)
+- Modules: `GnosticAbjad` and `GnosticAbjad.EC_SBox`
+- Zero external dependencies (core `Init` only)
+- All theorems are kernel-checked (`decide` / no `sorry`)
 
 ### VHDL / BSV
 
