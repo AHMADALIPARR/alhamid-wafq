@@ -13,5 +13,8 @@ lean_lib «GnosticAbjad» where
   -- GnosticAbjad.lean + GnosticAbjad/EC_SBox.lean
 
 lean_lib «EuclideanDivisionLock» where
-  -- Mathlib-dependent Euclidean division lock (links to LiquidJava)
   roots := #[`EuclideanDivisionLock]
+
+lean_lib «JavaDivisionModulo» where
+  -- Formalization of JVM / LiquidJava DivisionModuloLock
+  roots := #[`JavaDivisionModulo]
