@@ -4,6 +4,14 @@ open Lake DSL
 package «alhamid-wafq» where
   moreLeanArgs := #["-DwarningAsError=false"]
 
+require mathlib from git
+  "https://github.com/leanprover-community/mathlib4.git"
+
 @[default_target]
 lean_lib «GnosticAbjad» where
-  -- Automatically picks up GnosticAbjad.lean and GnosticAbjad/EC_SBox.lean
+  -- Core zero-dependency formalization
+  -- GnosticAbjad.lean + GnosticAbjad/EC_SBox.lean
+
+lean_lib «EuclideanDivisionLock» where
+  -- Mathlib-dependent Euclidean division lock (links to LiquidJava)
+  roots := #[`EuclideanDivisionLock]
